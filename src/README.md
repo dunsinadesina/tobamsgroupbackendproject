@@ -3,9 +3,17 @@
 ## Project Setup and Installation
 
 1. Clone the repository
+```sh
+git clone https://github.com/dunsinadesina/tobamsgroupbackendproject.git
+```
 2. Run `npm install` to install dependencies
-3. Set up MongoDB and update the connection string in `src/app.ts`
-4. Run the application using `npm run dev`
+3. Start the Server
+```sh
+npm start
+```
+4. Running Tests
+```npm test
+```
 
 ## API Endpoints
 

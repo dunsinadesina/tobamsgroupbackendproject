@@ -1,4 +1,4 @@
-import { MongoMemoryServer } from 'mongodb-memory-server';
+import { MongoMemoryServer } from 'mongodb-memory-server-core';
 import mongoose from 'mongoose';
 import path from 'path';
 import supertest from 'supertest';
@@ -12,9 +12,9 @@ beforeAll(async () => {
     mongoServer = await MongoMemoryServer.create();
     const mongoUri = mongoServer.getUri();
 
-    // await mongoose.connect(mongoUri, {
-    //     serverSelectionTimeoutMS: 30000
-    // });
+    await mongoose.connect(mongoUri, {
+        serverSelectionTimeoutMS: 30000
+    });
 
     await Book.deleteMany({});
 }, 30000);
@@ -22,7 +22,7 @@ beforeAll(async () => {
 afterAll(async () => {
     await mongoose.connection.close();
     await mongoServer.stop();
-});
+}, 30000);
 
 let bookId: string;
 
@@ -42,13 +42,13 @@ it('should get all books', async () => {
     const response = await request.get('/books');
     expect(response.status).toBe(200);
     expect(response.body).toHaveLength(1);
-},30000);
+}, 30000);
 
 it('should get a book by id', async () => {
     const response = await request.get(`/books/${bookId}`);
     expect(response.status).toBe(200);
     expect(response.body.title).toBe('Sample Book');
-},30000);
+}, 30000);
 
 it('should update a book by id', async () => {
     const response = await request.put(`/books/${bookId}`).send({
@@ -56,22 +56,22 @@ it('should update a book by id', async () => {
     });
     expect(response.status).toBe(200);
     expect(response.body.title).toBe('Updated Book Title');
-},30000);
+}, 30000);
 
 it('should delete a book by id', async () => {
     const response = await request.delete(`/books/${bookId}`);
     expect(response.status).toBe(200);
     const getResponse = await request.get(`/books/${bookId}`);
     expect(getResponse.status).toBe(404);
-},30000);
+}, 30000);
 
 describe('PATCH /books/cover-image/:id', () => {
     it('should update a book cover by id', async () => {
         const response = await request
-            .patch(`/books//cover-image/${bookId}`)
+            .patch(`/books/cover-image/${bookId}`)
             .attach('coverImage', path.join(__dirname, 'test-cover.jpg'));
 
         expect(response.status).toBe(200);
         expect(response.body.coverImage).toContain('uploads/');
-    },30000);
+    }, 30000);
 });

@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const mongodb_memory_server_1 = require("mongodb-memory-server");
+const mongodb_memory_server_core_1 = require("mongodb-memory-server-core");
 const mongoose_1 = __importDefault(require("mongoose"));
 const path_1 = __importDefault(require("path"));
 const supertest_1 = __importDefault(require("supertest"));
@@ -21,17 +21,17 @@ const book_1 = __importDefault(require("../models/book"));
 const request = (0, supertest_1.default)(app_1.default);
 let mongoServer;
 beforeAll(() => __awaiter(void 0, void 0, void 0, function* () {
-    mongoServer = yield mongodb_memory_server_1.MongoMemoryServer.create();
+    mongoServer = yield mongodb_memory_server_core_1.MongoMemoryServer.create();
     const mongoUri = mongoServer.getUri();
-    // await mongoose.connect(mongoUri, {
-    //     serverSelectionTimeoutMS: 30000
-    // });
+    yield mongoose_1.default.connect(mongoUri, {
+        serverSelectionTimeoutMS: 30000
+    });
     yield book_1.default.deleteMany({});
 }), 30000);
 afterAll(() => __awaiter(void 0, void 0, void 0, function* () {
     yield mongoose_1.default.connection.close();
     yield mongoServer.stop();
-}));
+}), 30000);
 let bookId;
 it('should create a book', () => __awaiter(void 0, void 0, void 0, function* () {
     const response = yield request.post('/books').send({
@@ -70,7 +70,7 @@ it('should delete a book by id', () => __awaiter(void 0, void 0, void 0, functio
 describe('PATCH /books/cover-image/:id', () => {
     it('should update a book cover by id', () => __awaiter(void 0, void 0, void 0, function* () {
         const response = yield request
-            .patch(`/books//cover-image/${bookId}`)
+            .patch(`/books/cover-image/${bookId}`)
             .attach('coverImage', path_1.default.join(__dirname, 'test-cover.jpg'));
         expect(response.status).toBe(200);
         expect(response.body.coverImage).toContain('uploads/');

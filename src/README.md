@@ -12,7 +12,8 @@ git clone https://github.com/dunsinadesina/tobamsgroupbackendproject.git
 npm start
 ```
 4. Running Tests
-```npm test
+```sh
+npm test
 ```
 
 ## API Endpoints
